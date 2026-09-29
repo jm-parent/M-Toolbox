@@ -1,0 +1,256 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MToolbox.App.ViewModels"
+        x:Class="MToolbox.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="M'Toolbox"
+        Width="1180" Height="640"
+        MinWidth="760" MinHeight="480"
+        WindowStartupLocation="CenterScreen">
+
+  <Window.Resources>
+    <!-- Carte en mode grille -->
+    <DataTemplate x:Key="GridCard" x:DataType="vm:ProjectViewModel">
+      <Button Classes="card" Margin="8" Command="{Binding ShowDetailsCommand}">
+        <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="10">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+            <Border Grid.Column="1" Classes="badge" BorderBrush="{Binding TypeBrush}" Margin="8,0,0,0">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Ellipse Width="6" Height="6" Fill="{Binding TypeBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{Binding TypeBrush}" />
+              </StackPanel>
+            </Border>
+          </Grid>
+
+          <TextBlock Grid.Row="1" Text="{Binding Description}" Classes="secondary" TextWrapping="Wrap"
+                     MaxLines="3" TextTrimming="CharacterEllipsis" MinHeight="54" />
+
+          <ItemsControl Grid.Row="2" ItemsSource="{Binding Technologies}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Border Classes="chip"><TextBlock Text="{Binding}" /></Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Border Grid.Row="3" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+              <Border Classes="avatar" Background="{Binding AvatarBrush}">
+                <TextBlock Text="{Binding LeadInitials}" />
+              </Border>
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Lead}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                <TextBlock Text="{Binding ContributorsText, StringFormat='• {0}'}" Classes="muted" VerticalAlignment="Center" />
+              </StackPanel>
+              <TextBlock Grid.Column="2" Text="Détails →" Foreground="{DynamicResource AccentBrush}"
+                         FontWeight="SemiBold" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+        </Grid>
+      </Button>
+    </DataTemplate>
+
+    <!-- Ligne en mode liste -->
+    <DataTemplate x:Key="ListRow" x:DataType="vm:ProjectViewModel">
+      <Button Classes="card" Margin="0,0,0,8" Padding="16,12" Command="{Binding ShowDetailsCommand}">
+        <Grid ColumnDefinitions="2*,Auto,*,Auto" ColumnSpacing="20">
+          <StackPanel VerticalAlignment="Center" Spacing="2">
+            <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{Binding Description}" Classes="secondary" FontSize="12"
+                       TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+          <Border Grid.Column="1" Classes="badge" BorderBrush="{Binding TypeBrush}" VerticalAlignment="Center">
+            <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{Binding TypeBrush}" />
+          </Border>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <Border Classes="avatar" Background="{Binding AvatarBrush}"><TextBlock Text="{Binding LeadInitials}" /></Border>
+            <TextBlock Text="{Binding Lead}" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+          </StackPanel>
+          <TextBlock Grid.Column="3" Text="Détails →" Foreground="{DynamicResource AccentBrush}"
+                     FontWeight="SemiBold" VerticalAlignment="Center" />
+        </Grid>
+      </Button>
+    </DataTemplate>
+  </Window.Resources>
+
+  <Grid RowDefinitions="*,Auto">
+
+    <Grid Margin="28,20,28,12" RowDefinitions="Auto,Auto,Auto,*">
+
+      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,18">
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <TextBlock Text="Projets internes" Classes="h1" />
+          <Border Background="{DynamicResource ChipBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Version, StringFormat='v{0}'}" Classes="muted" />
+          </Border>
+        </StackPanel>
+        <Button Grid.Column="1" Command="{Binding RefreshCommand}" IsEnabled="{Binding !IsLoading}" Padding="16,8">
+          <TextBlock Text="↻  Actualiser" />
+        </Button>
+      </Grid>
+
+      <Border Grid.Row="1" Classes="panel" Padding="12" Margin="0,0,0,16">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12">
+          <TextBox x:Name="SearchBox" Text="{Binding SearchText}"
+                   PlaceholderText="Rechercher un projet, une techno, un lead…  (Ctrl+F)" />
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="Type :" Classes="secondary" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding TypeOptions}" SelectedItem="{Binding SelectedType}" MinWidth="130">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:TypeOption"><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <Button Grid.Column="2" Content="Technologies ▾">
+            <Button.Flyout>
+              <Flyout Placement="BottomEdgeAlignedLeft">
+                <ScrollViewer MaxHeight="320" MinWidth="200">
+                  <ItemsControl ItemsSource="{Binding Technologies}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:TechnologyOption">
+                        <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Name}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
+
+          <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="Trier par :" Classes="secondary" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}" MinWidth="110">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:SortOption"><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <TextBlock Grid.Column="4" Text="{Binding CountText}" Classes="secondary" VerticalAlignment="Center" />
+
+          <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="4">
+            <ToggleButton Content="▦" ToolTip.Tip="Grille" IsChecked="{Binding IsGridView, Mode=OneWay}"
+                          Command="{Binding ShowGridCommand}" />
+            <ToggleButton Content="☰" ToolTip.Tip="Liste" IsChecked="{Binding IsListView, Mode=OneWay}"
+                          Command="{Binding ShowListCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Grid.Row="2" Background="#3B1D1D" BorderBrush="#7F2D2D" BorderThickness="1" CornerRadius="8"
+              Padding="12" Margin="0,0,0,12"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" TextWrapping="Wrap" />
+      </Border>
+
+      <Grid Grid.Row="3" x:Name="ListHost">
+        <ScrollViewer x:Name="ProjectsScroll" IsVisible="{Binding IsGridView}">
+          <ItemsControl ItemsSource="{Binding VisibleProjects}" ItemTemplate="{StaticResource GridCard}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <UniformGrid Columns="{Binding Columns}" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <ScrollViewer IsVisible="{Binding IsListView}">
+          <ItemsControl ItemsSource="{Binding VisibleProjects}" ItemTemplate="{StaticResource ListRow}" Margin="0,0,8,0" />
+        </ScrollViewer>
+
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" IsVisible="{Binding HasNoResults}">
+          <TextBlock Text="Aucun projet ne correspond à votre recherche." Classes="secondary" />
+          <Button Content="Réinitialiser les filtres" Command="{Binding ResetFiltersCommand}" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+
+    <!-- Page de détails -->
+    <Border Background="{DynamicResource WindowBackgroundBrush}" IsVisible="{Binding IsDetailOpen}">
+      <ScrollViewer>
+        <StackPanel Margin="28,20" Spacing="18" MaxWidth="860" HorizontalAlignment="Stretch"
+                    DataContext="{Binding SelectedProject}" x:DataType="vm:ProjectViewModel">
+          <Button Content="← Retour" Click="OnBackClick" HorizontalAlignment="Left" />
+
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{Binding Title}" Classes="h1" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Border Classes="badge" BorderBrush="{Binding TypeBrush}">
+                  <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{Binding TypeBrush}" />
+                </Border>
+                <TextBlock Text="{Binding SourceLabel}" Classes="muted" VerticalAlignment="Center" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+              <Button Content="Ouvrir" Command="{Binding OpenSourceCommand}" IsVisible="{Binding IsWebLink}"
+                      Classes="accent" />
+              <Button Content="Copier le lien" Command="{Binding CopySourceCommand}" IsVisible="{Binding HasSource}" />
+            </StackPanel>
+          </Grid>
+
+          <TextBlock Text="{Binding Description}" TextWrapping="Wrap" FontSize="15"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+
+          <ItemsControl ItemsSource="{Binding Technologies}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <Border Classes="chip"><TextBlock Text="{Binding}" /></Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Border Classes="panel" Padding="16">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="24" RowSpacing="10">
+              <TextBlock Text="Responsable" Classes="secondary" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <Border Classes="avatar" Background="{Binding AvatarBrush}"><TextBlock Text="{Binding LeadInitials}" /></Border>
+                <TextBlock Text="{Binding Lead}" VerticalAlignment="Center" />
+              </StackPanel>
+
+              <TextBlock Grid.Row="1" Text="Contributeurs" Classes="secondary" />
+              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Project.Contributors}" />
+
+              <TextBlock Grid.Row="2" Text="Dernière activité" Classes="secondary" />
+              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastActivityText}" />
+
+              <TextBlock Grid.Row="3" Text="Source" Classes="secondary" />
+              <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SourceUrl}" TextWrapping="Wrap" />
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Barre de statut -->
+    <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+            BorderThickness="0,1,0,0" Padding="16,6">
+      <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="14">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="#34D399" IsVisible="{Binding IsOnline}" />
+          <Ellipse Width="8" Height="8" VerticalAlignment="Center" Fill="#FB923C" IsVisible="{Binding !IsOnline}" />
+          <TextBlock Text="{Binding ConnectionText}" Classes="muted" />
+        </StackPanel>
+        <TextBlock Grid.Column="1" Text="|" Classes="muted" />
+        <TextBlock Grid.Column="2" Text="{Binding TotalText}" Classes="muted" Foreground="{DynamicResource AccentBrush}" />
+
+        <TextBlock Grid.Column="4" Text="{Binding SyncText}" Classes="muted" />
+        <Button Grid.Column="5" Content="{Binding UpdateText}" Command="{Binding ApplyUpdateCommand}"
+                IsVisible="{Binding UpdateText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Padding="8,2" FontSize="12" />
+        <TextBlock Grid.Column="6" Text="{Binding StatusText}" Classes="muted" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

@@ -1,0 +1,160 @@
+{
+  "$schema": "./catalogue.schema.json",
+  "schemaVersion": 1,
+  "projects": [
+    {
+      "id": "krypton-design-system",
+      "title": "Krypton Design System",
+      "description": "Refonte de la librairie UI unifiée multiplateforme pour nos logiciels internes avec Avalonia 11 et C#.",
+      "type": "windows-app",
+      "technologies": ["Avalonia 11", ".NET 8", "C#", "SkiaSharp"],
+      "lead": "Sophie L.",
+      "contributors": 6,
+      "lastActivity": "2026-09-27",
+      "source": { "kind": "github", "url": "https://github.com/example/krypton-design-system" }
+    },
+    {
+      "id": "pulse-analytics-engine",
+      "title": "Pulse Analytics Engine",
+      "description": "Microservice d'ingestion et visualisation de télémétrie en temps réel pour l'infrastructure cloud.",
+      "type": "web-app",
+      "technologies": ["Go", "Kafka", "ClickHouse", "Docker"],
+      "lead": "Marc K.",
+      "contributors": 4,
+      "lastActivity": "2026-09-25",
+      "source": { "kind": "github", "url": "https://github.com/example/pulse-analytics-engine" }
+    },
+    {
+      "id": "nexus-identity-sso",
+      "title": "Nexus Identity & SSO",
+      "description": "Passerelle centrale d'authentification OAuth2 / OpenID Connect pour l'ensemble des postes de travail.",
+      "type": "web-app",
+      "technologies": ["ASP.NET", "Redis", "Azure AD", "Postgres"],
+      "lead": "Antoine R.",
+      "contributors": 5,
+      "lastActivity": "2026-09-22",
+      "source": { "kind": "devops", "url": "https://dev.azure.com/example/Nexus/_git/nexus-identity" }
+    },
+    {
+      "id": "omnidesk-crm-client",
+      "title": "OmniDesk CRM Client",
+      "description": "Application lourde desktop cross-platform pour les équipes support et service client.",
+      "type": "windows-app",
+      "technologies": ["Avalonia UI", "C#", "GraphQL", "SQLite"],
+      "lead": "Camille L.",
+      "contributors": 8,
+      "lastActivity": "2026-09-18",
+      "source": { "kind": "devops", "url": "https://dev.azure.com/example/OmniDesk/_git/omnidesk-client" }
+    },
+    {
+      "id": "docuflow-engine",
+      "title": "DocuFlow Engine",
+      "description": "Module de génération automatisée de rapports PDF et archivage légal chiffré.",
+      "type": "tools",
+      "technologies": ["Rust", "Wasm", "Python"],
+      "lead": "Thomas H.",
+      "contributors": 3,
+      "lastActivity": "2026-09-10",
+      "source": { "kind": "github", "url": "https://github.com/example/docuflow-engine" }
+    },
+    {
+      "id": "atlas-data-pipeline",
+      "title": "Atlas Data Pipeline",
+      "description": "Pipeline ETL de synchronisation des bases de données legacy vers notre data lake.",
+      "type": "script",
+      "technologies": ["Python", "Airflow", "Snowflake"],
+      "lead": "Emma B.",
+      "contributors": 2,
+      "lastActivity": "2026-08-30",
+      "source": { "kind": "script", "url": "\\\\srv-fichiers\\scripts\\atlas" }
+    },
+    {
+      "id": "sentinel-monitoring",
+      "title": "Sentinel Monitoring",
+      "description": "Tableau de bord de supervision des serveurs et alertes d'exploitation.",
+      "type": "web-app",
+      "technologies": ["Grafana", "Prometheus", "Docker"],
+      "lead": "Julien P.",
+      "contributors": 4,
+      "lastActivity": "2026-09-26",
+      "source": { "kind": "github", "url": "https://github.com/example/sentinel-monitoring" }
+    },
+    {
+      "id": "cleanup-temp-files",
+      "title": "Cleanup Temp Files",
+      "description": "Script PowerShell de nettoyage des fichiers temporaires et caches sur les postes Windows.",
+      "type": "script",
+      "technologies": ["PowerShell"],
+      "lead": "Nadia F.",
+      "contributors": 1,
+      "lastActivity": "2026-07-14",
+      "source": { "kind": "script", "url": "\\\\srv-fichiers\\scripts\\cleanup.ps1" }
+    },
+    {
+      "id": "badge-printer",
+      "title": "Badge Printer",
+      "description": "Outil d'impression de badges visiteurs depuis l'annuaire interne.",
+      "type": "windows-app",
+      "technologies": ["WPF", "C#", ".NET 8"],
+      "lead": "Lucas M.",
+      "contributors": 2,
+      "lastActivity": "2026-06-02",
+      "source": { "kind": "devops", "url": "https://dev.azure.com/example/Facilities/_git/badge-printer" }
+    },
+    {
+      "id": "expense-tracker",
+      "title": "Expense Tracker",
+      "description": "Saisie et validation des notes de frais avec export comptable.",
+      "type": "web-app",
+      "technologies": ["React", "TypeScript", "Node.js"],
+      "lead": "Claire D.",
+      "contributors": 5,
+      "lastActivity": "2026-09-15",
+      "source": { "kind": "github", "url": "https://github.com/example/expense-tracker" }
+    },
+    {
+      "id": "log-parser",
+      "title": "Log Parser",
+      "description": "Utilitaire en ligne de commande d'analyse et de filtrage des journaux applicatifs.",
+      "type": "tools",
+      "technologies": ["Rust", "CLI"],
+      "lead": "Hugo T.",
+      "contributors": 2,
+      "lastActivity": "2026-05-20",
+      "source": { "kind": "github", "url": "https://github.com/example/log-parser" }
+    },
+    {
+      "id": "onboarding-portal",
+      "title": "Onboarding Portal",
+      "description": "Portail d'accueil des nouveaux arrivants : checklists, accès et documentation.",
+      "type": "web-app",
+      "technologies": ["Blazor", "C#", "Postgres"],
+      "lead": "Sarah G.",
+      "contributors": 3,
+      "lastActivity": "2026-09-05",
+      "source": { "kind": "devops", "url": "https://dev.azure.com/example/HR/_git/onboarding-portal" }
+    },
+    {
+      "id": "db-backup-scheduler",
+      "title": "DB Backup Scheduler",
+      "description": "Planification et vérification des sauvegardes de bases SQL Server.",
+      "type": "script",
+      "technologies": ["PowerShell", "SQL Server"],
+      "lead": "Marc K.",
+      "contributors": 2,
+      "lastActivity": "2026-04-11",
+      "source": { "kind": "script", "url": "\\\\srv-fichiers\\scripts\\db-backup" }
+    },
+    {
+      "id": "icon-forge",
+      "title": "Icon Forge",
+      "description": "Générateur d'icônes et de ressources graphiques pour les applications internes.",
+      "type": "tools",
+      "technologies": ["C#", "SkiaSharp", "Avalonia UI"],
+      "lead": "Sophie L.",
+      "contributors": 1,
+      "lastActivity": "2026-09-01",
+      "source": { "kind": "github", "url": "https://github.com/example/icon-forge" }
+    }
+  ]
+}

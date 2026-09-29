@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - run: dotnet test MToolbox.slnx -c Release
+
+      - name: Publish
+        run: >
+          dotnet publish src/MToolbox.App -c Release -r win-x64 --self-contained
+          -p:Version=${{ steps.version.outputs.value }} -o publish
+
+      - run: dotnet tool install -g vpk
+
+      # Récupère la release précédente pour générer les deltas.
+      - run: vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - run: >
+          vpk pack --packId MToolbox --packVersion ${{ steps.version.outputs.value }}
+          --packDir publish --mainExe MToolbox.exe --packTitle "M'Toolbox"
+
+      - run: >
+          vpk upload github --repoUrl https://github.com/${{ github.repository }}
+          --token ${{ secrets.GITHUB_TOKEN }} --publish
+          --releaseName "M'Toolbox ${{ steps.version.outputs.value }}" --tag ${{ github.ref_name }}
