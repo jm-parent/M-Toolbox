@@ -28,7 +28,8 @@ jobs:
           dotnet publish src/MToolbox.App -c Release -r win-x64 --self-contained
           -p:Version=${{ steps.version.outputs.value }} -o publish
 
-      - run: dotnet tool install -g vpk
+      # La version de vpk doit correspondre à celle du package Velopack de l'application.
+      - run: dotnet tool install -g vpk --version 1.2.161
 
       # Récupère la release précédente pour générer les deltas.
       - run: vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
