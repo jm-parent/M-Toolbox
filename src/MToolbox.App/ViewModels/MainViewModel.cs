@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MToolbox.App.Services;
 using MToolbox.Core.Catalogue;
+using MToolbox.Core.Enrichment;
 using MToolbox.Core.Models;
 
 namespace MToolbox.App.ViewModels;
@@ -15,14 +16,27 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly ICatalogueProvider _catalogue;
     private readonly IPlatformService _platform;
     private readonly IUpdateService _updates;
+    private readonly IEnrichmentService _enrichment;
+    private readonly ILaunchService _launcher;
+    private readonly ILogoService _logos;
     private IReadOnlyList<ProjectViewModel> _all = [];
     private bool _suspendRefresh;
 
-    public MainViewModel(ICatalogueProvider catalogue, IPlatformService platform, IUpdateService updates, string version)
+    public MainViewModel(
+        ICatalogueProvider catalogue,
+        IPlatformService platform,
+        IUpdateService updates,
+        IEnrichmentService enrichment,
+        ILaunchService launcher,
+        ILogoService logos,
+        string version)
     {
         _catalogue = catalogue;
         _platform = platform;
         _updates = updates;
+        _enrichment = enrichment;
+        _launcher = launcher;
+        _logos = logos;
         Version = version;
 
         TypeOptions =
@@ -59,6 +73,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _isOnline;
     [ObservableProperty] private DateTimeOffset? _syncedAt;
     [ObservableProperty] private string? _availableUpdate;
+    [ObservableProperty] private string? _notification;
 
     public int TotalCount => _all.Count;
     public string CountText => $"{VisibleProjects.Count} / {TotalCount} affichés";
@@ -67,7 +82,7 @@ public sealed partial class MainViewModel : ObservableObject
     public bool HasNoResults => !IsLoading && VisibleProjects.Count == 0;
     public bool IsDetailOpen => SelectedProject is not null;
     public string ConnectionText => IsOnline ? "Catalogue : Connecté" : "Catalogue : Hors ligne";
-    public string StatusText => IsLoading ? "Chargement…" : "Prêt";
+    public string StatusText => Notification ?? (IsLoading ? "Chargement…" : "Prêt");
     public string? UpdateText => AvailableUpdate is null ? null : $"Mise à jour {AvailableUpdate} disponible";
 
     public string SyncText => SyncedAt is not { } at ? "Jamais synchronisé" : (DateTimeOffset.Now - at) switch
@@ -99,11 +114,12 @@ public sealed partial class MainViewModel : ObservableObject
         try
         {
             var result = await _catalogue.LoadAsync();
-            _all = result.Catalogue.Projects.Select(p => new ProjectViewModel(p, _platform, ShowDetails)).ToList();
+            _all = result.Catalogue.Projects.Select(p => new ProjectViewModel(p, _platform, ShowDetails, LaunchAsync)).ToList();
             IsOnline = !result.FromCache;
             SyncedAt = result.SyncedAt;
             RebuildTechnologies();
             ApplyFilters();
+            _ = LoadLogosAsync(_all);
         }
         catch (Exception ex)
         {
@@ -121,7 +137,44 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand] private void CloseDetails() => SelectedProject = null;
     [RelayCommand] private Task ApplyUpdate() => _updates.ApplyAndRestartAsync();
 
-    private void ShowDetails(ProjectViewModel project) => SelectedProject = project;
+    private void ShowDetails(ProjectViewModel project)
+    {
+        SelectedProject = project;
+        _ = LoadEnrichmentAsync(project);
+    }
+
+    /// <summary>À appeler quand les PAT changent : les erreurs et données mises en cache ne sont plus valables.</summary>
+    public void ResetEnrichment()
+    {
+        _enrichment.Clear();
+        foreach (var p in _all) p.Enrichment = null;
+        if (SelectedProject is { } current) _ = LoadEnrichmentAsync(current);
+    }
+
+    private async Task LaunchAsync(ProjectViewModel project)
+    {
+        Notification = "En cours…";
+        Notification = await _launcher.LaunchAsync(project.Project);
+    }
+
+    private async Task LoadEnrichmentAsync(ProjectViewModel project)
+    {
+        if (project.IsEnriching) return;
+
+        project.IsEnriching = true;
+        try
+        {
+            project.Enrichment = await _enrichment.GetAsync(project.Project);
+        }
+        finally
+        {
+            project.IsEnriching = false;
+        }
+    }
+
+    private async Task LoadLogosAsync(IEnumerable<ProjectViewModel> projects) =>
+        await Task.WhenAll(projects.Where(p => p.Project.Logo is not null)
+            .Select(async p => p.Logo = await _logos.LoadAsync(p.Project)));
 
     [RelayCommand]
     private void ResetFilters()
@@ -146,6 +199,7 @@ public sealed partial class MainViewModel : ObservableObject
     partial void OnSyncedAtChanged(DateTimeOffset? value) => OnPropertyChanged(nameof(SyncText));
     partial void OnSelectedProjectChanged(ProjectViewModel? value) => OnPropertyChanged(nameof(IsDetailOpen));
     partial void OnAvailableUpdateChanged(string? value) => OnPropertyChanged(nameof(UpdateText));
+    partial void OnNotificationChanged(string? value) => OnPropertyChanged(nameof(StatusText));
 
     partial void OnIsLoadingChanged(bool value)
     {

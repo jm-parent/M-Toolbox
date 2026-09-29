@@ -31,6 +31,15 @@
               "kind": { "enum": ["github", "devops", "script"] },
               "url": { "type": "string" }
             }
+          },
+          "launch": {
+            "type": "object",
+            "required": ["kind"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "enum": ["url", "path", "command", "github-release"] },
+              "value": { "type": "string", "description": "URL, chemin, commande, ou motif du fichier de release (ex. *Setup.exe)" }
+            }
           }
         }
       }

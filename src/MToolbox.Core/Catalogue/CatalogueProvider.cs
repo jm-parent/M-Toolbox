@@ -8,12 +8,16 @@ public sealed record CatalogueResult(ProjectCatalogue Catalogue, DateTimeOffset 
 
 public interface ICatalogueProvider
 {
+    Uri Source { get; }
+
     Task<CatalogueResult> LoadAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>Lit le catalogue depuis une URL ou un fichier local, avec cache disque et ETag.</summary>
 public sealed class CatalogueProvider(Uri source, string cacheDirectory, HttpClient http) : ICatalogueProvider
 {
+    public Uri Source => source;
+
     private string CacheFile => Path.Combine(cacheDirectory, "catalogue.json");
     private string ETagFile => Path.Combine(cacheDirectory, "catalogue.etag");
 

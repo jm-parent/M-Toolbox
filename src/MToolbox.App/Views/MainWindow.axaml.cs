@@ -2,11 +2,14 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using MToolbox.App.ViewModels;
+using MToolbox.Core.Enrichment;
 
 namespace MToolbox.App.Views;
 
 public partial class MainWindow : Window
 {
+    public ITokenStore? TokenStore { get; set; }
+
     public MainWindow()
     {
         InitializeComponent();
@@ -36,4 +39,12 @@ public partial class MainWindow : Window
 
     private void OnBackClick(object? sender, RoutedEventArgs e) =>
         (DataContext as MainViewModel)?.CloseDetailsCommand.Execute(null);
+
+    private async void OnSettingsClick(object? sender, RoutedEventArgs e)
+    {
+        if (TokenStore is null) return;
+
+        var changed = await new SettingsWindow(TokenStore).ShowDialog<bool>(this);
+        if (changed) (DataContext as MainViewModel)?.ResetEnrichment();
+    }
 }

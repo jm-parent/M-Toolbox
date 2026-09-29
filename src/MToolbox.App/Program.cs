@@ -1,5 +1,8 @@
+using System.Runtime.Versioning;
 using Avalonia;
 using Velopack;
+
+[assembly: SupportedOSPlatform("windows5.1.2600")]
 
 namespace MToolbox.App;
 

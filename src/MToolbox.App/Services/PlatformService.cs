@@ -1,11 +1,14 @@
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
+using MToolbox.App.Views;
+
 namespace MToolbox.App.Services;
 
 public interface IPlatformService
 {
     Task OpenUrlAsync(string url);
     Task CopyToClipboardAsync(string text);
+    Task<bool> ConfirmAsync(string title, string message);
 }
 
 public sealed class AvaloniaPlatformService(Func<TopLevel?> topLevel) : IPlatformService
@@ -24,4 +27,7 @@ public sealed class AvaloniaPlatformService(Func<TopLevel?> topLevel) : IPlatfor
     {
         if (topLevel()?.Clipboard is { } clipboard) await clipboard.SetTextAsync(text);
     }
+
+    public async Task<bool> ConfirmAsync(string title, string message) =>
+        topLevel() is Window owner && await new ConfirmDialog(title, message).ShowDialog<bool>(owner);
 }

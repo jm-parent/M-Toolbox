@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="MToolbox.App.Views.SettingsWindow"
+        Title="Paramètres"
+        Width="520" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <StackPanel Margin="24" Spacing="20">
+    <TextBlock Text="Accès aux dépôts privés" Classes="h1" FontSize="18" />
+    <TextBlock Classes="secondary" TextWrapping="Wrap"
+               Text="Les jetons (PAT) sont stockés dans le Gestionnaire d'identifiants Windows et servent uniquement à interroger GitHub et Azure DevOps." />
+
+    <StackPanel Spacing="6">
+      <TextBlock Text="PAT GitHub" FontWeight="SemiBold" />
+      <TextBlock Text="Dépôts privés : droit « Contents » et « Metadata » en lecture seule." Classes="muted" TextWrapping="Wrap" />
+      <TextBox x:Name="GitHubBox" PasswordChar="•" />
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <TextBlock Text="PAT Azure DevOps" FontWeight="SemiBold" />
+      <TextBlock Text="Droits « Code » et « Build » en lecture seule." Classes="muted" TextWrapping="Wrap" />
+      <TextBox x:Name="DevOpsBox" PasswordChar="•" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Fermer" Click="OnCloseClick" />
+      <Button Content="Enregistrer" Classes="accent" Click="OnSaveClick" />
+    </StackPanel>
+  </StackPanel>
+</Window>

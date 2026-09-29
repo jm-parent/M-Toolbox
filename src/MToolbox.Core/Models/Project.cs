@@ -19,6 +19,17 @@ public enum SourceKind
 
 public sealed record ProjectSource(SourceKind Kind, string Url);
 
+public enum LaunchKind
+{
+    [JsonStringEnumMemberName("url")] Url,
+    [JsonStringEnumMemberName("path")] Path,
+    [JsonStringEnumMemberName("command")] Command,
+    [JsonStringEnumMemberName("github-release")] GitHubRelease,
+}
+
+/// <summary>Value : URL, chemin, commande, ou motif du fichier de release (ex. *.msi) selon Kind.</summary>
+public sealed record LaunchSpec(LaunchKind Kind, string? Value = null);
+
 public sealed record Project
 {
     public required string Id { get; init; }
@@ -31,6 +42,7 @@ public sealed record Project
     public int Contributors { get; init; }
     public DateOnly? LastActivity { get; init; }
     public ProjectSource? Source { get; init; }
+    public LaunchSpec? Launch { get; init; }
 }
 
 public sealed record ProjectCatalogue

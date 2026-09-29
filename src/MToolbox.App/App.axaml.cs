@@ -7,6 +7,7 @@ using MToolbox.App.Services;
 using MToolbox.App.ViewModels;
 using MToolbox.App.Views;
 using MToolbox.Core.Catalogue;
+using MToolbox.Core.Enrichment;
 
 namespace MToolbox.App;
 
@@ -36,8 +37,21 @@ public partial class App : Application
                 Uri.TryCreate(source, UriKind.Absolute, out var uri) ? uri : new Uri(Path.GetFullPath(source)),
                 cacheDir, http);
 
+            var tokens = new CredentialTokenStore();
+            var gitHubHttp = new HttpClient { BaseAddress = GitHubEnricher.ApiBase, Timeout = TimeSpan.FromSeconds(15) };
+            gitHubHttp.DefaultRequestHeaders.UserAgent.ParseAdd("MToolbox");
+            var devOpsHttp = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            devOpsHttp.DefaultRequestHeaders.UserAgent.ParseAdd("MToolbox");
+            var downloadHttp = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+            downloadHttp.DefaultRequestHeaders.UserAgent.ParseAdd("MToolbox");
+
+            var enrichment = new EnrichmentService([new GitHubEnricher(gitHubHttp, tokens), new DevOpsEnricher(devOpsHttp, tokens)]);
+            var launcher = new LaunchService(platform, enrichment, tokens, downloadHttp, Path.Combine(Path.GetDirectoryName(cacheDir)!, "downloads"));
+            var logos = new LogoService(provider.Source, cacheDir, http);
+
             var version = Assembly.GetExecutingAssembly().GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "?";
-            window.DataContext = new MainViewModel(provider, platform, new UpdateService(RepoUrl), version);
+            window.TokenStore = tokens;
+            window.DataContext = new MainViewModel(provider, platform, new UpdateService(RepoUrl), enrichment, launcher, logos, version);
             desktop.MainWindow = window;
         }
 

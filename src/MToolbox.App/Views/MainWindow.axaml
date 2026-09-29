@@ -13,10 +13,11 @@
     <DataTemplate x:Key="GridCard" x:DataType="vm:ProjectViewModel">
       <Button Classes="card" Margin="8" Command="{Binding ShowDetailsCommand}">
         <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="10">
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
-            <Border Grid.Column="1" Classes="badge" BorderBrush="{Binding TypeBrush}" Margin="8,0,0,0">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Image Source="{Binding Logo}" IsVisible="{Binding HasLogo}" Width="28" Height="28" Margin="0,0,10,0" />
+            <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="17" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <Border Grid.Column="2" Classes="badge" BorderBrush="{Binding TypeBrush}" Margin="8,0,0,0">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <Ellipse Width="6" Height="6" Fill="{Binding TypeBrush}" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{Binding TypeBrush}" />
@@ -90,9 +91,12 @@
             <TextBlock Text="{Binding Version, StringFormat='v{0}'}" Classes="muted" />
           </Border>
         </StackPanel>
-        <Button Grid.Column="1" Command="{Binding RefreshCommand}" IsEnabled="{Binding !IsLoading}" Padding="16,8">
-          <TextBlock Text="↻  Actualiser" />
-        </Button>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Content="⚙" ToolTip.Tip="Paramètres (accès aux dépôts privés)" Padding="12,8" Click="OnSettingsClick" />
+          <Button Command="{Binding RefreshCommand}" IsEnabled="{Binding !IsLoading}" Padding="16,8">
+            <TextBlock Text="↻  Actualiser" />
+          </Button>
+        </StackPanel>
       </Grid>
 
       <Border Grid.Row="1" Classes="panel" Padding="12" Margin="0,0,0,16">
@@ -153,10 +157,10 @@
 
       <Grid Grid.Row="3" x:Name="ListHost">
         <ScrollViewer x:Name="ProjectsScroll" IsVisible="{Binding IsGridView}">
-          <ItemsControl ItemsSource="{Binding VisibleProjects}" ItemTemplate="{StaticResource GridCard}">
+          <ItemsControl ItemsSource="{Binding VisibleProjects}" ItemTemplate="{StaticResource GridCard}" VerticalAlignment="Top">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
-                <UniformGrid Columns="{Binding Columns}" />
+                <UniformGrid Columns="{Binding Columns}" VerticalAlignment="Top" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>
@@ -181,18 +185,22 @@
           <Button Content="← Retour" Click="OnBackClick" HorizontalAlignment="Left" />
 
           <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Spacing="6">
-              <TextBlock Text="{Binding Title}" Classes="h1" TextWrapping="Wrap" />
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <Border Classes="badge" BorderBrush="{Binding TypeBrush}">
-                  <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{Binding TypeBrush}" />
-                </Border>
-                <TextBlock Text="{Binding SourceLabel}" Classes="muted" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Image Source="{Binding Logo}" IsVisible="{Binding HasLogo}" Width="56" Height="56" />
+              <StackPanel Spacing="6" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Title}" Classes="h1" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Border Classes="badge" BorderBrush="{Binding TypeBrush}">
+                    <TextBlock Text="{Binding TypeLabel}" FontSize="11" Foreground="{Binding TypeBrush}" />
+                  </Border>
+                  <TextBlock Text="{Binding SourceLabel}" Classes="muted" VerticalAlignment="Center" />
+                </StackPanel>
               </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
-              <Button Content="Ouvrir" Command="{Binding OpenSourceCommand}" IsVisible="{Binding IsWebLink}"
+              <Button Content="{Binding LaunchLabel}" Command="{Binding LaunchCommand}" IsVisible="{Binding HasLaunch}"
                       Classes="accent" />
+              <Button Content="Voir la source" Command="{Binding OpenSourceCommand}" IsVisible="{Binding IsWebLink}" />
               <Button Content="Copier le lien" Command="{Binding CopySourceCommand}" IsVisible="{Binding HasSource}" />
             </StackPanel>
           </Grid>
@@ -211,8 +219,13 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
+          <Border Background="#3B2A12" BorderBrush="#7F5A1D" BorderThickness="1" CornerRadius="8" Padding="12"
+                  IsVisible="{Binding HasEnrichmentError}">
+            <TextBlock Text="{Binding EnrichmentError}" Foreground="#FCD34D" TextWrapping="Wrap" />
+          </Border>
+
           <Border Classes="panel" Padding="16">
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="24" RowSpacing="10">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="24" RowSpacing="10">
               <TextBlock Text="Responsable" Classes="secondary" />
               <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                 <Border Classes="avatar" Background="{Binding AvatarBrush}"><TextBlock Text="{Binding LeadInitials}" /></Border>
@@ -220,15 +233,26 @@
               </StackPanel>
 
               <TextBlock Grid.Row="1" Text="Contributeurs" Classes="secondary" />
-              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Project.Contributors}" />
+              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ContributorsDisplay}" />
 
               <TextBlock Grid.Row="2" Text="Dernière activité" Classes="secondary" />
               <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastActivityText}" />
 
-              <TextBlock Grid.Row="3" Text="Source" Classes="secondary" />
-              <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SourceUrl}" TextWrapping="Wrap" />
+              <TextBlock Grid.Row="3" Text="Dernière version" Classes="secondary" IsVisible="{Binding HasLatestVersion}" />
+              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding LatestVersionText}" IsVisible="{Binding HasLatestVersion}" />
+
+              <TextBlock Grid.Row="4" Text="Langages" Classes="secondary" IsVisible="{Binding HasLanguages}" />
+              <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding LanguagesText}" IsVisible="{Binding HasLanguages}" />
+
+              <TextBlock Grid.Row="5" Text="Dernier build" Classes="secondary" IsVisible="{Binding HasBuildStatus}" />
+              <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding BuildStatusText}" IsVisible="{Binding HasBuildStatus}" />
+
+              <TextBlock Grid.Row="6" Text="Source" Classes="secondary" />
+              <SelectableTextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SourceUrl}" TextWrapping="Wrap" />
             </Grid>
           </Border>
+
+          <TextBlock Text="Mise à jour des données en direct…" Classes="muted" IsVisible="{Binding IsEnriching}" />
         </StackPanel>
       </ScrollViewer>
     </Border>
