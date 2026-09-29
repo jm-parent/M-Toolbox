@@ -36,7 +36,7 @@ jobs:
 
       - run: >
           vpk pack --packId MToolbox --packVersion ${{ steps.version.outputs.value }}
-          --packDir publish --mainExe MToolbox.exe --packTitle "M'Toolbox"
+          --packDir publish --mainExe MToolbox.exe --packTitle "M'Toolbox" --icon src/MToolbox.App/Assets/icon.ico
 
       - run: >
           vpk upload github --repoUrl https://github.com/${{ github.repository }}
