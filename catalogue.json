@@ -26,6 +26,17 @@
       "lastActivity": "2026-09-29",
       "source": { "kind": "github", "url": "https://github.com/jm-parent/RateMySDD" },
       "launch": { "kind": "url", "value": "https://rate-my-sdd.vercel.app/" }
+    },
+    {
+      "id": "plan-factory",
+      "title": "PlanFactory",
+      "description": "Application de planification de production : frontend React et API .NET organisés en monorepo avec gouvernance Copilot centralisée.",
+      "type": "web-app",
+      "technologies": ["React", "TypeScript", "Vite", "Tailwind CSS", ".NET", "ASP.NET Core"],
+      "lead": "Jean-Marie P.",
+      "contributors": 11,
+      "lastActivity": "2026-09-15",
+      "source": { "kind": "devops", "url": "https://dev.azure.com/exakis-lyn-log-net/PlanFactory/_git/PlanFactory" }
     }
   ]
 }
