@@ -37,6 +37,15 @@
       "contributors": 11,
       "lastActivity": "2026-09-15",
       "source": { "kind": "devops", "url": "https://dev.azure.com/exakis-lyn-log-net/PlanFactory/_git/PlanFactory" }
+    },
+    {
+      "id": "rob-ado-cop",
+      "title": "Rob.ADO.Cop",
+      "description": "Rob-ADO-Cop est une solution d'automatisation intelligente conçue pour faire régner l'ordre dans votre backlog Azure DevOps. Fini les tickets qui traînent et la dette technique qui s'accumule.\r\n\r\nDès qu'un item lui est envoyé, Rob-ADO-Cop prend les commandes :\r\n\r\nScan automatique de l'item Azure DevOps (User Story, Bug, Task).\r\n\r\nAnalyse et résolution du problème en s'appuyant sur la puissance du SDK GitHub Copilot.\r\n\r\nSoumission et validation automatique pour clore le ticket sans intervention manuelle.\r\n\r\nParce que votre backlog a besoin de justice, et que la justice s'écrit en lignes de code.",
+      "type": "web-app",
+      "lead": "Benjamin Bollet",
+      "contributors": 0,
+      "source": { "kind": "devops", "url": "https://dev.azure.com/exakis-lyn-log-net/Rob.ADO.Cop/_git/Rob.ADO.Cop.MCP" }
     }
   ]
 }
