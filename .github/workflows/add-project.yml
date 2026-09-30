@@ -1,0 +1,63 @@
+name: Add project
+
+on:
+  issues:
+    types: [opened]
+
+permissions: {}
+
+concurrency:
+  group: add-project
+  cancel-in-progress: false
+
+jobs:
+  add:
+    # Seules les issues créées depuis le formulaire (label posé par le template) sont traitées.
+    if: contains(github.event.issue.labels.*.name, 'add-project')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # Le corps de l'issue est non fiable : il passe uniquement par une variable d'environnement, jamais dans un script shell.
+      - id: add
+        continue-on-error: true
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: dotnet run --project tools/AddProject -c Release -- catalogue.json logos "$RUNNER_TEMP/error.txt"
+
+      - name: Create pull request
+        if: steps.add.outcome == 'success'
+        env:
+          PROJECT_ID: ${{ steps.add.outputs.project_id }}
+        run: |
+          branch="add-project/${PROJECT_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add catalogue.json logos
+          git commit -m "Ajouter le projet ${PROJECT_ID}"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Ajouter le projet ${PROJECT_ID}" \
+            --body "Demande créée depuis M'Toolbox. Closes #${ISSUE_NUMBER}"
+
+      - name: Reject request
+        if: steps.add.outcome == 'failure'
+        run: |
+          {
+            echo "La demande n'a pas pu être traitée :"
+            echo
+            cat "$RUNNER_TEMP/error.txt" 2>/dev/null || echo "Erreur inattendue, voir les logs du workflow."
+          } > "$RUNNER_TEMP/comment.md"
+          gh issue comment "$ISSUE_NUMBER" --body-file "$RUNNER_TEMP/comment.md"
+          gh issue close "$ISSUE_NUMBER" --reason "not planned"

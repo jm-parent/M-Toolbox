@@ -45,13 +45,15 @@ public partial class App : Application
             var downloadHttp = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
             downloadHttp.DefaultRequestHeaders.UserAgent.ParseAdd("MToolbox");
 
-            var enrichment = new EnrichmentService([new GitHubEnricher(gitHubHttp, tokens), new DevOpsEnricher(devOpsHttp, tokens)]);
+            IProjectEnricher[] enrichers = [new GitHubEnricher(gitHubHttp, tokens), new DevOpsEnricher(devOpsHttp, tokens)];
+            var enrichment = new EnrichmentService(enrichers);
             var launcher = new LaunchService(platform, enrichment, tokens, downloadHttp, Path.Combine(Path.GetDirectoryName(cacheDir)!, "downloads"));
             var logos = new LogoService(provider.Source, cacheDir, http);
+            var prefill = new ProjectPrefillService(enrichers);
 
             var version = Assembly.GetExecutingAssembly().GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "?";
             window.TokenStore = tokens;
-            window.DataContext = new MainViewModel(provider, platform, new UpdateService(RepoUrl), enrichment, launcher, logos, version);
+            window.DataContext = new MainViewModel(provider, platform, new UpdateService(RepoUrl), enrichment, launcher, logos, prefill, RepoUrl, version);
             desktop.MainWindow = window;
         }
 

@@ -50,7 +50,13 @@ public sealed partial class GitHubEnricher(HttpClient http, ITokenStore tokens) 
             var contributors = await GetContributorsAsync(root, token, cancellationToken);
             var languages = await GetLanguagesAsync(root, token, cancellationToken);
 
-            return release with { LastActivity = lastActivity, Contributors = contributors, Languages = languages };
+            return release with
+            {
+                LastActivity = lastActivity,
+                Contributors = contributors,
+                Languages = languages,
+                Description = repoDoc.RootElement.TryGetProperty("description", out var d) && d.ValueKind == JsonValueKind.String ? d.GetString() : null,
+            };
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException
                                        or InvalidOperationException or KeyNotFoundException

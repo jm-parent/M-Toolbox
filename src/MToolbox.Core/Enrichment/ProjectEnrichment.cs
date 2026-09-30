@@ -7,6 +7,7 @@ public sealed record ReleaseAsset(string Name, string Url);
 public sealed record ProjectEnrichment
 {
     public string? LatestVersion { get; init; }
+    public string? Description { get; init; }
     public DateTimeOffset? LatestReleaseDate { get; init; }
     public DateTimeOffset? LastActivity { get; init; }
     public int? Contributors { get; init; }

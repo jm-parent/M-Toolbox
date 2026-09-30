@@ -1,0 +1,125 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MToolbox.App.ViewModels"
+        x:Class="MToolbox.App.Views.AddProjectWindow"
+        x:DataType="vm:AddProjectViewModel"
+        Title="Ajouter un projet"
+        Icon="/Assets/icon.png"
+        Width="640" Height="760" MinHeight="520"
+        WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="*,Auto">
+    <ScrollViewer>
+      <StackPanel Margin="24" Spacing="16">
+        <TextBlock Text="Ajouter un projet" Classes="h1" FontSize="18" />
+        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                   Text="La demande s'ouvre comme une issue GitHub ; une pull request modifiant le catalogue est ensuite créée automatiquement. Aucun jeton n'est nécessaire, seulement un compte GitHub." />
+
+        <Border Classes="panel" Padding="12">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Préremplir depuis une URL" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+              <TextBox Text="{Binding PrefillUrl}" PlaceholderText="https://github.com/… ou https://dev.azure.com/…/_git/…" />
+              <Button Grid.Column="1" Content="Analyser" Command="{Binding PrefillCommand}" IsEnabled="{Binding !IsBusy}" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Titre *" FontWeight="SemiBold" />
+          <TextBox Text="{Binding Title}" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Identifiant *" FontWeight="SemiBold" />
+          <TextBox Text="{Binding Id}" PlaceholderText="mon-projet" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Description" FontWeight="SemiBold" />
+          <TextBox Text="{Binding Description}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" />
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Type *" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding TypeOptions}" SelectedItem="{Binding SelectedType}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:Option"><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="Responsable" FontWeight="SemiBold" />
+            <TextBox Text="{Binding Lead}" />
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Technologies (séparées par des virgules)" FontWeight="SemiBold" />
+          <TextBox Text="{Binding TechnologiesText}" />
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Contributeurs" FontWeight="SemiBold" />
+            <TextBox Text="{Binding ContributorsText}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="Dernière activité" FontWeight="SemiBold" />
+            <TextBox Text="{Binding LastActivityText}" PlaceholderText="AAAA-MM-JJ" />
+          </StackPanel>
+        </Grid>
+
+        <Grid ColumnDefinitions="200,*" ColumnSpacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Source" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding SourceOptions}" SelectedItem="{Binding SelectedSource}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:Option"><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="URL de la source" FontWeight="SemiBold" />
+            <TextBox Text="{Binding SourceUrl}" />
+          </StackPanel>
+        </Grid>
+
+        <Grid ColumnDefinitions="200,*" ColumnSpacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Lancement" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding LaunchOptions}" SelectedItem="{Binding SelectedLaunch}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:Option"><TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="Valeur (URL, chemin, commande ou motif)" FontWeight="SemiBold" />
+            <TextBox Text="{Binding LaunchValue}" />
+          </StackPanel>
+        </Grid>
+
+        <TextBlock Classes="muted" TextWrapping="Wrap"
+                   Text="Logo : glissez une image PNG (2 Mo max) dans le champ « Logo » de l'issue avant de la valider." />
+
+        <Border Background="#3B1D1D" BorderBrush="#7F2D2D" BorderThickness="1" CornerRadius="8" Padding="12"
+                IsVisible="{Binding ErrorText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding ErrorText}" Foreground="#FCA5A5" TextWrapping="Wrap" />
+        </Border>
+        <Border Classes="panel" Padding="12"
+                IsVisible="{Binding InfoText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding InfoText}" TextWrapping="Wrap" />
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+            BorderThickness="0,1,0,0" Padding="24,12">
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <Button Content="Fermer" Click="OnCloseClick" />
+        <Button Content="Créer la demande" Classes="accent" Command="{Binding SubmitCommand}" IsEnabled="{Binding !IsBusy}" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

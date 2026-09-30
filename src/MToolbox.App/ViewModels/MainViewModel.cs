@@ -19,6 +19,8 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IEnrichmentService _enrichment;
     private readonly ILaunchService _launcher;
     private readonly ILogoService _logos;
+    private readonly IProjectPrefillService _prefill;
+    private readonly string _repoUrl;
     private IReadOnlyList<ProjectViewModel> _all = [];
     private bool _suspendRefresh;
 
@@ -29,6 +31,8 @@ public sealed partial class MainViewModel : ObservableObject
         IEnrichmentService enrichment,
         ILaunchService launcher,
         ILogoService logos,
+        IProjectPrefillService prefill,
+        string repoUrl,
         string version)
     {
         _catalogue = catalogue;
@@ -37,6 +41,8 @@ public sealed partial class MainViewModel : ObservableObject
         _enrichment = enrichment;
         _launcher = launcher;
         _logos = logos;
+        _prefill = prefill;
+        _repoUrl = repoUrl;
         Version = version;
 
         TypeOptions =
@@ -92,6 +98,9 @@ public sealed partial class MainViewModel : ObservableObject
         { TotalHours: < 24 } t => $"Synchronisé il y a {(int)t.TotalHours}h",
         var t => $"Synchronisé il y a {(int)t.TotalDays}j",
     };
+
+    public AddProjectViewModel CreateAddProject() =>
+        new(_prefill, _platform, _all.Select(p => p.Project.Id).ToList(), _repoUrl);
 
     public async Task InitializeAsync()
     {
