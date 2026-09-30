@@ -14,6 +14,17 @@
       "lastActivity": "2026-09-25",
       "source": { "kind": "github", "url": "https://github.com/jm-parent/CreditsTracker" },
       "launch": { "kind": "github-release", "value": "*Setup.exe" }
+    },{
+      "id": "rate-my-sdd",
+      "title": "RateMySDD",
+      "description": "Application web qui audite une spécification Markdown avec GitHub Copilot : six piliers notés de 0 à 100, avec description et pistes d'amélioration.",
+      "type": "web-app",
+      "technologies": ["TypeScript", "Fastify", "Vite", "Redis", "Vercel"],
+      "lead": "Jean-Marie P.",
+      "contributors": 1,
+      "lastActivity": "2026-09-29",
+      "source": { "kind": "github", "url": "https://github.com/jm-parent/RateMySDD" },
+      "launch": { "kind": "url", "value": "https://rate-my-sdd.vercel.app/" }
     },
     
     {
