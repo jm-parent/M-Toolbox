@@ -83,6 +83,41 @@
 
   <Grid RowDefinitions="*,Auto">
 
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
+
+    <!-- Menu latéral rétractable -->
+    <Border Classes="sidebar" Classes.collapsed="{Binding !IsMenuExpanded}">
+      <Grid RowDefinitions="Auto,*,Auto" Margin="8">
+        <Button Classes="nav" Command="{Binding ToggleMenuCommand}" ToolTip.Tip="Réduire / développer le menu">
+          <Grid ColumnDefinitions="24,*" ColumnSpacing="12">
+            <TextBlock Text="☰" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="Menu" FontWeight="SemiBold" VerticalAlignment="Center"
+                       IsVisible="{Binding IsMenuExpanded}" />
+          </Grid>
+        </Button>
+
+        <StackPanel Grid.Row="1" Margin="0,12,0,0" Spacing="4">
+          <Button Classes="nav active" ToolTip.Tip="Projets Internes">
+            <Grid ColumnDefinitions="24,*" ColumnSpacing="12">
+              <TextBlock Text="▦" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="Projets Internes" VerticalAlignment="Center"
+                         TextTrimming="CharacterEllipsis" IsVisible="{Binding IsMenuExpanded}" />
+            </Grid>
+          </Button>
+        </StackPanel>
+
+        <Button Grid.Row="2" Classes="nav" Click="OnSettingsClick" ToolTip.Tip="Paramètres (accès aux dépôts privés)">
+          <Grid ColumnDefinitions="24,*" ColumnSpacing="12">
+            <TextBlock Text="⚙" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="Paramètres" VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis" IsVisible="{Binding IsMenuExpanded}" />
+          </Grid>
+        </Button>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Column="1">
+
     <Grid Margin="28,20,28,12" RowDefinitions="Auto,Auto,Auto,*">
 
       <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,18">
@@ -94,7 +129,6 @@
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
           <Button Content="+  Ajouter un projet" Padding="16,8" Click="OnAddProjectClick" />
-          <Button Content="⚙" ToolTip.Tip="Paramètres (accès aux dépôts privés)" Padding="12,8" Click="OnSettingsClick" />
           <Button Command="{Binding RefreshCommand}" IsEnabled="{Binding !IsLoading}" Padding="16,8">
             <TextBlock Text="↻  Actualiser" />
           </Button>
@@ -258,6 +292,9 @@
         </StackPanel>
       </ScrollViewer>
     </Border>
+
+    </Grid>
+    </Grid>
 
     <!-- Barre de statut -->
     <Border Grid.Row="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
