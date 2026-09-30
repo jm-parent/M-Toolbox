@@ -40,6 +40,11 @@ public partial class MainWindow : Window
     private void OnBackClick(object? sender, RoutedEventArgs e) =>
         (DataContext as MainViewModel)?.CloseDetailsCommand.Execute(null);
 
+    private async void OnAddProjectClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel vm) await new AddProjectWindow(vm.CreateAddProject()).ShowDialog(this);
+    }
+
     private async void OnSettingsClick(object? sender, RoutedEventArgs e)
     {
         if (TokenStore is null) return;

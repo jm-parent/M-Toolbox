@@ -6,4 +6,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/MToolbox.Tests/MToolbox.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/AddProject/AddProject.csproj" />
+  </Folder>
 </Solution>

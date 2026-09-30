@@ -1,0 +1,24 @@
+name: Ajouter un projet
+description: Proposer un nouveau projet pour le catalogue (généralement créé depuis M'Toolbox).
+title: "Ajouter le projet : "
+labels: ["add-project"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une pull request modifiant `catalogue.json` sera créée automatiquement après validation.
+  - type: textarea
+    id: project-json
+    attributes:
+      label: Projet (JSON)
+      description: Rempli par M'Toolbox. Ne le modifiez que si vous savez ce que vous faites.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: logo
+    attributes:
+      label: Logo (optionnel)
+      description: Glissez ici une image PNG (2 Mo maximum).
+    validations:
+      required: false
