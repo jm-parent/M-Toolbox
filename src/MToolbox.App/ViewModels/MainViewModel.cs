@@ -80,6 +80,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private DateTimeOffset? _syncedAt;
     [ObservableProperty] private string? _availableUpdate;
     [ObservableProperty] private string? _notification;
+    [ObservableProperty] private bool _isMenuExpanded = true;
 
     public int TotalCount => _all.Count;
     public string CountText => $"{VisibleProjects.Count} / {TotalCount} affichés";
@@ -144,6 +145,7 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand] private void ShowGrid() => IsGridView = true;
     [RelayCommand] private void ShowList() => IsGridView = false;
     [RelayCommand] private void CloseDetails() => SelectedProject = null;
+    [RelayCommand] private void ToggleMenu() => IsMenuExpanded = !IsMenuExpanded;
     [RelayCommand] private Task ApplyUpdate() => _updates.ApplyAndRestartAsync();
 
     private void ShowDetails(ProjectViewModel project)
